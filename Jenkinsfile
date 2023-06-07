@@ -30,18 +30,18 @@ timestamps {
             '''
         }
         stage('Image Scanning by Aqua') {
-        //    withCredentials([
-        //        string(credentialsId: 'AQUA_REGISTRY_USER', variable: 'AQUA_REGISTRY_USER'),
-        //        string(credentialsId: 'AQUA_REGISTRY_PASSWORD', variable: 'AQUA_REGISTRY_PASSWORD'),
-    //  string(credentialsId: 'AQUA_REGISTRY', variable: 'AQUA_REGISTRY'),
-    //  string(credentialsId: 'AQUA_HOST', variable: 'AQUA_HOST'),
-    //  string(credentialsId: 'AQUA_SCANNER_TOKEN', variable: 'AQUA_SCANNER_TOKEN')
-        //    ]) {
+            withCredentials([
+                string(credentialsId: 'AQUA_REGISTRY_USER', variable: 'AQUA_REGISTRY_USER'),
+                string(credentialsId: 'AQUA_REGISTRY_PASSWORD', variable: 'AQUA_REGISTRY_PASSWORD'),
+     // string(credentialsId: 'AQUA_REGISTRY', variable: 'AQUA_REGISTRY'),
+     // string(credentialsId: 'AQUA_HOST', variable: 'AQUA_HOST'),
+     // string(credentialsId: 'AQUA_SCANNER_TOKEN', variable: 'AQUA_SCANNER_TOKEN')
+            ]) {
               sh '''
               podman run --rm -e $AQUA_KEY -e $AQUA_SECRET -e TRIVY_RUN_AS_PLUGIN=aqua -e SAST=true -e INPUT_WORKING_DIRECTORY=/scanning -e TRIVY_SCANNERS=config,vuln,secret -v /aquajcampbell:/scanning docker.io/aquasec/aqua-scanner trivy fs .
               '''
-    //       }
-        //}
+           }
+        }
         stage('Manifest Generation') {
             withCredentials([
                 // Replace GITLAB_CREDENTIALS_ID with the id of your gitlab credentials
