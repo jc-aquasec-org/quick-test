@@ -29,7 +29,7 @@ timestamps {
             echo the image has been built !!
             '''
         }
-    //stage('Image Scanning by Aqua') {
+        stage('Image Scanning by Aqua') {
         //    withCredentials([
         //        string(credentialsId: 'AQUA_REGISTRY_USER', variable: 'AQUA_REGISTRY_USER'),
         //        string(credentialsId: 'AQUA_REGISTRY_PASSWORD', variable: 'AQUA_REGISTRY_PASSWORD'),
@@ -37,10 +37,9 @@ timestamps {
     //  string(credentialsId: 'AQUA_HOST', variable: 'AQUA_HOST'),
     //  string(credentialsId: 'AQUA_SCANNER_TOKEN', variable: 'AQUA_SCANNER_TOKEN')
         //    ]) {
-        //      sh '''
-    //            docker login -u "$AQUA_REGISTRY_USER" -p "$AQUA_REGISTRY_PASSWORD" $AQUA_REGISTRY
-    //           docker run -e BUILD_JOB_NAME=$JOB_NAME -e BUILD_URL=$BUILD_URL -e BUILD_NUMBER=$BUILD_NUMBER --rm -v /var/run/docker.sock:/var/run/docker.sock $AQUA_REGISTRY/scanner:2022.4.46 scan --register --registry "Docker Hub" --local "aquasaemea/mynodejs-app:1.0" --host $AQUA_HOST --token $AQUA_SCANNER_TOKEN --show-negligible --html > aquascan.html
-        //      '''
+              sh '''
+              podman run --rm -e $AQUA_KEY -e $AQUA_SECRET -e TRIVY_RUN_AS_PLUGIN=aqua -e SAST=true -e INPUT_WORKING_DIRECTORY=/scanning -e TRIVY_SCANNERS=config,vuln,secret -v /aquajcampbell:/scanning docker.io/aquasec/aqua-scanner trivy fs .
+              '''
     //       }
         //}
         stage('Manifest Generation') {
