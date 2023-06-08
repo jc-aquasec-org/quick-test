@@ -46,15 +46,7 @@ timestamps {
              }
            }
 
-        stage('Execute Tracee') {
-                      steps {
-                        script {
-                          sh '''
-                          docker run -e ACCESS_TOKEN=${{ secrets.GITHUB_TOKEN }} -e AQUA_KEY=${{ secrets.AQUA_KEY }} -e AQUA_SECRET=${{ secrets.AQUA_SECRET }} argonsecurity/tracee-commercial-action:main
-                          '''
-                        }
-                      }
-                    }
+
         stage('Checkout code') {
           steps {
             script {
