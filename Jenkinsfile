@@ -36,7 +36,6 @@ timestamps {
                 string(credentialsId: 'AQUA_REGISTRY_PASSWORD', variable: 'AQUA_REGISTRY_PASSWORD'),
             ]) }
          }    
-pipeline {
        agent {
          label 'ubuntu-latest'
         }
@@ -45,7 +44,6 @@ pipeline {
             IMAGE_NAME = 'podman-jc:podman-jc-ubuntu-16.04'
             IMAGE_TAG = "${env.BUILD_NUMBER}" // $GITHUB_RUN_NUMBER
           }
-        }
 
        stage('Checkout code') {
           steps {
