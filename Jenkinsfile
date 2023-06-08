@@ -1,78 +1,56 @@
 timestamps {
-    node(){
-        checkout scm
-        stage("Preparation"){
-            sh '''
-                find .
-                printenv | sort
-            '''
+    pipeline {
+        agent {
+            label 'ubuntu-latest'
         }
-        stage('Code Repository Scanned by Aqua') {
-            withCredentials([
-                string(credentialsId: 'AQUA_KEY', variable: 'AQUA_KEY'),
-                string(credentialsId: 'AQUA_SECRET', variable: 'AQUA_SECRET'),
-                string(credentialsId: 'GITHUB_TOKEN', variable: 'GITHUB_TOKEN')
-            ]) {
-                sh '''
-                    export TRIVY_RUN_AS_PLUGIN=aqua
-                    export trivyVersion=0.42.0
-                    curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b . v${trivyVersion}
-                    ./trivy plugin update aqua
-                    ./trivy fs --scanners config,vuln,secret . --sast
-                '''
-            }
-        }
-        stage('Build Docker Image') {
-            // fake build by downloading an image
-        // docker pull aquasaemea/mynodejs-app:1.0
-            sh '''
-            echo 'the image has been built !!'
-            '''
-        }
-        
-        stage('Podman Scanning Stage') {
-            withCredentials([
-                string(credentialsId: 'AQUA_REGISTRY_USER', variable: 'AQUA_REGISTRY_USER'),
-                string(credentialsId: 'AQUA_REGISTRY_PASSWORD', variable: 'AQUA_REGISTRY_PASSWORD'),
-            ]) }
-         }    
-       agent {
-         label 'ubuntu-latest'
-        }
-         environment {
+        environment {
             DOCKER_REPOSITORY = 'aquajcampbell' // name of Docker Hub ID
             IMAGE_NAME = 'podman-jc:podman-jc-ubuntu-16.04'
             IMAGE_TAG = "${env.BUILD_NUMBER}" // $GITHUB_RUN_NUMBER
-          }
+        }
 
-       stage('Checkout code') {
-          steps {
-            script {
-               git 'https://github.com/${{ github.repository }}'
-                  }
-                }
-              }
-        stage('Login to DockerHub') {
-          steps {
-            script {
-              sh '''
-                docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
-                '''
-                   }
-                 }
-               }
-        stage('Aqua Code Scanning (SCA, IaC, and SAST)') {
-          steps {
-            echo 'Podman running Scans'
-               script {
-                 sh '''
-                   podman run -e AQUA_KEY=${{ secrets.AQUA_KEY }} -e AQUA_SECRET=${{ secrets.AQUA_SECRET }} -e GITHUB_TOKEN=${{ github.token }} -e TRIVY_RUN_AS_PLUGIN=aqua aquasec/aqua-scanner trivy fs --scanners config,vuln,secret . --sast
-                '''
+        stages {
+            stage('Preparation') {
+                steps {
+                    script {
+                        checkout scm
+                        sh '''
+                            find .
+                            printenv | sort
+                        '''
                     }
-                  }
                 }
-              }
-        
+            }
+
+            stage('Code Repository Scanned by Aqua') {
+                steps {
+                    withCredentials([
+                        string(credentialsId: 'AQUA_KEY', variable: 'AQUA_KEY'),
+                        string(credentialsId: 'AQUA_SECRET', variable: 'AQUA_SECRET'),
+                        string(credentialsId: 'GITHUB_TOKEN', variable: 'GITHUB_TOKEN')
+                    ]) {
+                        sh '''
+                            export TRIVY_RUN_AS_PLUGIN=aqua
+                            export trivyVersion=0.42.0
+                            curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b . v${trivyVersion}
+                            ./trivy plugin update aqua
+                            ./trivy fs --scanners config,vuln,secret . --sast
+                        '''
+                    }
+                }
+            }
+
+            stage('Build Docker Image') {
+                steps {
+                    // fake build by downloading an image
+                    // docker pull aquasaemea/mynodejs-app:1.0
+                    sh '''
+                        echo 'the image has been built !!'
+                    '''
+                }
+            }
+
+
      //   stage('Image Scanning by Aqua') {
      //       withCredentials([
      //           string(credentialsId: 'AQUA_REGISTRY_USER', variable: 'AQUA_REGISTRY_USER'),
