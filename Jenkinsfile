@@ -118,10 +118,3 @@ timestamps {
                 '''
             }
         }
-        //post {
-            //always {
-                //archiveArtifacts artifacts: '/'
-           // }
-        //}
-    }
-}
