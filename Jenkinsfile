@@ -36,18 +36,18 @@ timestamps {
                 string(credentialsId: 'AQUA_REGISTRY_PASSWORD', variable: 'AQUA_REGISTRY_PASSWORD'),
             ]) {
                 
-        pipeline {
-          agent {
-            label 'ubuntu-latest'
-           }
-            environment {
-               DOCKER_REPOSITORY = 'aquajcampbell' // name of Docker Hub ID
-               IMAGE_NAME = 'podman-jc:podman-jc-ubuntu-16.04'
-               IMAGE_TAG = "${env.BUILD_NUMBER}" // $GITHUB_RUN_NUMBER
-             }
-           }
+    pipeline {
+       agent {
+         label 'ubuntu-latest'
+        }
+         environment {
+            DOCKER_REPOSITORY = 'aquajcampbell' // name of Docker Hub ID
+            IMAGE_NAME = 'podman-jc:podman-jc-ubuntu-16.04'
+            IMAGE_TAG = "${env.BUILD_NUMBER}" // $GITHUB_RUN_NUMBER
+          }
+        }
 
-        stage('Checkout code') {
+       stage('Checkout code') {
           steps {
             script {
                git 'https://github.com/${{ github.repository }}'
