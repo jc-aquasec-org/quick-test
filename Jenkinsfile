@@ -75,8 +75,6 @@ timestamps {
                   }
                 }
                 '''
-
-Please note that the Jenkinsfile syntax is written in Groovy, so the YAML content has been transformed into Groovy code blocks. Also, make sure to adjust the `argonsecurity/tracee-commercial-action` and `aquasec/aqua-scanner` image versions according to your requirements.
         
      //   stage('Image Scanning by Aqua') {
      //       withCredentials([
