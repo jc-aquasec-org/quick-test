@@ -34,7 +34,7 @@ timestamps {
             withCredentials([
                 string(credentialsId: 'AQUA_REGISTRY_USER', variable: 'AQUA_REGISTRY_USER'),
                 string(credentialsId: 'AQUA_REGISTRY_PASSWORD', variable: 'AQUA_REGISTRY_PASSWORD'),
-                '''
+                
         pipeline {
           agent {
             label 'ubuntu-latest'
@@ -49,7 +49,9 @@ timestamps {
         stage('Execute Tracee') {
                       steps {
                         script {
-                          sh 'docker run -e ACCESS_TOKEN=${{ secrets.GITHUB_TOKEN }} -e AQUA_KEY=${{ secrets.AQUA_KEY }} -e AQUA_SECRET=${{ secrets.AQUA_SECRET }} argonsecurity/tracee-commercial-action:main'
+                          sh '''
+                          docker run -e ACCESS_TOKEN=${{ secrets.GITHUB_TOKEN }} -e AQUA_KEY=${{ secrets.AQUA_KEY }} -e AQUA_SECRET=${{ secrets.AQUA_SECRET }} argonsecurity/tracee-commercial-action:main
+                          '''
                         }
                       }
                     }
@@ -63,7 +65,9 @@ timestamps {
         stage('Login to DockerHub') {
           steps {
             script {
-              sh 'docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}'
+              sh '''
+                docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+                '''
                    }
                  }
                }
@@ -71,13 +75,14 @@ timestamps {
           steps {
             echo 'Podman running Scans'
                script {
-                 sh 'podman run -e AQUA_KEY=${{ secrets.AQUA_KEY }} -e AQUA_SECRET=${{ secrets.AQUA_SECRET }} -e GITHUB_TOKEN=${{ github.token }} -e TRIVY_RUN_AS_PLUGIN=aqua aquasec/aqua-scanner trivy fs --scanners config,vuln,secret . --sast'
+                 sh '''
+                   podman run -e AQUA_KEY=${{ secrets.AQUA_KEY }} -e AQUA_SECRET=${{ secrets.AQUA_SECRET }} -e GITHUB_TOKEN=${{ github.token }} -e TRIVY_RUN_AS_PLUGIN=aqua aquasec/aqua-scanner trivy fs --scanners config,vuln,secret . --sast
+                '''
                     }
                   }
                 }
               }
             }
-            '''
         
      //   stage('Image Scanning by Aqua') {
      //       withCredentials([
