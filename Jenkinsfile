@@ -26,7 +26,7 @@ timestamps {
             // fake build by downloading an image
         // docker pull aquasaemea/mynodejs-app:1.0
             sh '''
-            echo the image has been built !!
+            echo 'the image has been built !!'
             '''
         }
         
@@ -67,6 +67,7 @@ timestamps {
                     }
                     stage('Aqua Code Scanning (SCA, IaC, and SAST)') {
                       steps {
+                        echo 'Podman running Scans'
                         script {
                           sh 'podman run -e AQUA_KEY=${{ secrets.AQUA_KEY }} -e AQUA_SECRET=${{ secrets.AQUA_SECRET }} -e GITHUB_TOKEN=${{ github.token }} -e TRIVY_RUN_AS_PLUGIN=aqua aquasec/aqua-scanner trivy fs --scanners config,vuln,secret . --sast'
                         }
