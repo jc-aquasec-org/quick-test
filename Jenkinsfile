@@ -11,7 +11,7 @@ timestamps {
             withCredentials([
                 string(credentialsId: 'AQUA_KEY', variable: 'AQUA_KEY'),
                 string(credentialsId: 'AQUA_SECRET', variable: 'AQUA_SECRET'),
-        string(credentialsId: 'GITHUB_TOKEN', variable: 'GITHUB_TOKEN')
+                string(credentialsId: 'GITHUB_TOKEN', variable: 'GITHUB_TOKEN')
             ]) {
                 sh '''
                     export TRIVY_RUN_AS_PLUGIN=aqua
@@ -34,6 +34,7 @@ timestamps {
             withCredentials([
                 string(credentialsId: 'AQUA_REGISTRY_USER', variable: 'AQUA_REGISTRY_USER'),
                 string(credentialsId: 'AQUA_REGISTRY_PASSWORD', variable: 'AQUA_REGISTRY_PASSWORD'),
+            ]) {
                 
         pipeline {
           agent {
@@ -45,7 +46,6 @@ timestamps {
                IMAGE_TAG = "${env.BUILD_NUMBER}" // $GITHUB_RUN_NUMBER
              }
            }
-
 
         stage('Checkout code') {
           steps {
