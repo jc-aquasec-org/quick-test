@@ -74,7 +74,6 @@ timestamps {
                   }
                 }
               }
-            }
         
      //   stage('Image Scanning by Aqua') {
      //       withCredentials([
