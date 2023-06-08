@@ -36,7 +36,7 @@ timestamps {
                 string(credentialsId: 'AQUA_REGISTRY_PASSWORD', variable: 'AQUA_REGISTRY_PASSWORD'),
             ]) }
          }    
-    pipeline {
+pipeline {
        agent {
          label 'ubuntu-latest'
         }
