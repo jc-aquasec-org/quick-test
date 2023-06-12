@@ -13,14 +13,11 @@ timestamps {
                 string(credentialsId: 'AQUA_SECRET', variable: 'AQUA_SECRET'),
                 string(credentialsId: 'GITHUB_TOKEN', variable: 'GITHUB_TOKEN')
             ]) {
-                docker.image('python:3.8').inside {
                     sh '''
-                        apt-get update
-                        apt-get install -y python3-pip
-                        pip3 install semgrep==1.1.0
                         export TRIVY_RUN_AS_PLUGIN=aqua
                         export trivyVersion=0.42.0
                         curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b . v${trivyVersion}
+                        pip3 install semgrep==1.1.0
                         ./trivy plugin update aqua
                         ./trivy fs --scanners config,vuln,secret . --sast
                     '''
