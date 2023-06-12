@@ -14,6 +14,7 @@ timestamps {
         string(credentialsId: 'GITHUB_TOKEN', variable: 'GITHUB_TOKEN')
             ]) {
                 sh '''
+                    pip3 install semgrep==1.1.0
                     export TRIVY_RUN_AS_PLUGIN=aqua
                     export trivyVersion=0.42.0
                     curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b . v${trivyVersion}
@@ -32,50 +33,7 @@ timestamps {
         
 
 
-                '''
-                groovy
-                pipeline {
-                  agent {
-                    label 'ubuntu-latest'
-                  }
-                  environment {
-                    DOCKER_REPOSITORY = 'aquajcampbell' // name of Docker Hub ID
-                    IMAGE_NAME = 'podman-jc:podman-jc-ubuntu-16.04'
-                    IMAGE_TAG = "${env.BUILD_NUMBER}" // $GITHUB_RUN_NUMBER
-                  }
-                  stages {
-                    stage('Execute Tracee') {
-                      steps {
-                        script {
-                          sh 'docker run -e ACCESS_TOKEN=${{ secrets.GITHUB_TOKEN }} -e AQUA_KEY=${{ secrets.AQUA_KEY }} -e AQUA_SECRET=${{ secrets.AQUA_SECRET }} argonsecurity/tracee-commercial-action:main'
-                        }
-                      }
-                    }
-                    stage('Checkout code') {
-                      steps {
-                        script {
-                          git 'https://github.com/${{ github.repository }}'
-                        }
-                      }
-                    }
-                    stage('Login to DockerHub') {
-                      steps {
-                        script {
-                          sh 'docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}'
-                        }
-                      }
-                    }
-                    stage('Aqua Code Scanning (SCA, IaC, and SAST)') {
-                      steps {
-                        echo 'Podman running Scans'
-                        script {
-                          sh 'podman run -e AQUA_KEY=${{ secrets.AQUA_KEY }} -e AQUA_SECRET=${{ secrets.AQUA_SECRET }} -e GITHUB_TOKEN=${{ github.token }} -e TRIVY_RUN_AS_PLUGIN=aqua aquasec/aqua-scanner trivy fs --scanners config,vuln,secret . --sast'
-                        }
-                      }
-                    }
-                  }
-                }
-                '''
+
         
      //   stage('Image Scanning by Aqua') {
      //       withCredentials([
