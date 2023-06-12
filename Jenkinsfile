@@ -13,17 +13,29 @@ timestamps {
                 string(credentialsId: 'AQUA_SECRET', variable: 'AQUA_SECRET'),
                 string(credentialsId: 'GITHUB_TOKEN', variable: 'GITHUB_TOKEN')
             ]) {
-                    sh '''
-                        export TRIVY_RUN_AS_PLUGIN=aqua
-                        export trivyVersion=0.42.0
-                        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b . v${trivyVersion}
-                        pip3 install semgrep==1.1.0
-                        ./trivy plugin update aqua
-                        ./trivy fs --scanners config,vuln,secret . --sast
-                    '''
-                }
+                sh '''
+                    export TRIVY_RUN_AS_PLUGIN=aqua
+                    export trivyVersion=0.42.0
+                    curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b . v${trivyVersion}
+                    ./trivy plugin update aqua
+                '''
             }
         }
+        
+        stage('Install semgrep') {
+            sh '''
+                pip3 install semgrep==1.1.0
+            '''
+        }
+        
+        stage('Run Trivy with semgrep') {
+            sh '''
+                ./trivy fs --scanners config,vuln,secret . --sast
+            '''
+        }
+    }
+}
+
         stage('Build Docker Image') {
             // fake build by downloading an image
             // docker pull aquasaemea/mynodejs-app:1.0
@@ -90,4 +102,3 @@ stage('Manifest Generation') {
            // }
         //}
         }
-}
