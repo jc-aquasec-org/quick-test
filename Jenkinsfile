@@ -89,5 +89,6 @@ stage('Manifest Generation') {
                 //archiveArtifacts artifacts: '/'
            // }
         //}
+         }
     }
 }
