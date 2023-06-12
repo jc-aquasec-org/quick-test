@@ -43,9 +43,6 @@ timestamps {
 }
 
 
-
-
-
         stage('Build Docker Image') {
             // fake build by downloading an image
             // docker pull aquasaemea/mynodejs-app:1.0
