@@ -13,8 +13,8 @@ timestamps {
 
         stage('Install xz-utils') {
             sh '''
-                apt-get update
-                apt-get install -y xz-utils
+                sudo apt-get update
+                sudo apt-get install -y xz-utils
             '''
         }
 
@@ -30,7 +30,7 @@ timestamps {
 
         stage('Install semgrep') {
             sh '''
-                /opt/python/bin/python3 -m pip install semgrep==1.1.0
+                sudo /opt/python/bin/python3 -m pip install semgrep==1.1.0
             '''
         }
 
