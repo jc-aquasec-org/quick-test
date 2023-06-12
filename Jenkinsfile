@@ -24,7 +24,7 @@ timestamps {
         
         stage('Install semgrep') {
             sh '''
-                /opt/homebrew/bin/python3 /opt/homebrew/bin/pip3 install semgrep==1.1.0
+                python3 -m pip install semgrep==1.1.0
             '''
         }
         
