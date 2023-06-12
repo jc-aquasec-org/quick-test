@@ -11,26 +11,9 @@ timestamps {
             // Aqua scanning steps...
         }
 
-        stage('Install xz-utils') {
-            sh '''
-                sudo apt-get update
-                sudo apt-get install -y xz-utils
-            '''
-        }
-
-        stage('Install Python') {
-            sh '''
-                curl -sSLO https://www.python.org/ftp/python/3.9.7/python-3.9.7-linux-x86_64.tar.xz
-                tar -xf python-3.9.7-linux-x86_64.tar.xz
-                cd Python-3.9.7
-                ./configure --prefix=/opt/python --enable-optimizations
-                make install
-            '''
-        }
-
         stage('Install semgrep') {
             sh '''
-                sudo /opt/python/bin/python3 -m pip install semgrep==1.1.0
+                docker run --rm -v "$(pwd)":/app -w /app python:3.9.7-slim pip install semgrep==1.1.0
             '''
         }
 
@@ -41,6 +24,7 @@ timestamps {
         }
     }
 }
+
 
 
         stage('Build Docker Image') {
