@@ -11,6 +11,13 @@ timestamps {
             // Aqua scanning steps...
         }
 
+        stage('Install xz-utils') {
+            sh '''
+                apt-get update
+                apt-get install -y xz-utils
+            '''
+        }
+
         stage('Install Python') {
             sh '''
                 curl -sSLO https://www.python.org/ftp/python/3.9.7/python-3.9.7-linux-x86_64.tar.xz
@@ -34,6 +41,7 @@ timestamps {
         }
     }
 }
+
 
 
 
