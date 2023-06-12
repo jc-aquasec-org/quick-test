@@ -13,13 +13,16 @@ timestamps {
 
         stage('Install Python') {
             sh '''
-                apk add --update python3
+                curl -sS https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz | tar xzf -
+                cd Python-3.9.7
+                ./configure --enable-optimizations
+                make altinstall
             '''
         }
 
         stage('Install semgrep') {
             sh '''
-                python3 -m pip install semgrep==1.1.0
+                python3.9 -m pip install semgrep==1.1.0
             '''
         }
 
@@ -30,6 +33,7 @@ timestamps {
         }
     }
 }
+
 
 
         stage('Build Docker Image') {
