@@ -90,5 +90,3 @@ stage('Manifest Generation') {
            // }
         //}
         }
-    }
-}
