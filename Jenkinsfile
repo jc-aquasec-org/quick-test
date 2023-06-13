@@ -1,37 +1,60 @@
-pipeline {
-  agent any
-  stages {
-    stage('Aqua scanner') {
-      agent {
-        docker {
-          image 'docker://aquasec/aqua-scanner'
+timestamps {
+    node(){
+        checkout scm
+        stage("Preparation"){
+            sh '''
+                find .
+                printenv | sort
+            '''
         }
-      }
-      steps {
-        withCredentials([
-          string(credentialsId: 'AQUA_KEY', variable: 'AQUA_KEY'),
-          string(credentialsId: 'AQUA_SECRET', variable: 'AQUA_SECRET'),
-          string(credentialsId: 'GITHUB_TOKEN', variable: 'GITHUB_TOKEN')
-        ]){
-          sh '''
-            export TRIVY_RUN_AS_PLUGIN=aqua
-            trivy fs --scanners config,vuln,secret . --sast --reachability
-            # To customize which severities to scan for, add the following flag: --severity UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
-            # To enable SAST scanning, add: --sast
-            # To enable reachability scanning, add: --reachability
-            # To enable npm/dotnet non-lock file scanning, add: --package-json / --dotnet-proj
-            # For http/https proxy configuration add env vars: HTTP_PROXY/HTTPS_PROXY, CA-CRET (path to CA certificate)
-          '''
+        stage('Code Repository Scanned by Aqua') {
+            withCredentials([
+                string(credentialsId: 'AQUA_KEY', variable: 'AQUA_KEY'),
+                string(credentialsId: 'AQUA_SECRET', variable: 'AQUA_SECRET'),
+        string(credentialsId: 'GITHUB_TOKEN', variable: 'GITHUB_TOKEN')
+            ]) {
+                sh '''
+                    export TRIVY_RUN_AS_PLUGIN=aqua
+                    export trivyVersion=0.42.0
+                    curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b . v${trivyVersion}
+                    ./trivy plugin update aqua
+                    ./trivy fs --scanners config,vuln,secret . --sast
+                '''
+            }
         }
-      }
-    }
-  }
-}
-    stage('Manifest Generation') {
+
+        stage('Build Docker Image') {
+            // fake build by downloading an image
+            // docker pull aquasaemea/mynodejs-app:1.0
+            sh '''
+                echo 'the image has been built !!'
+            '''
+        }
+
+        
+
+
+
+        
+     //   stage('Image Scanning by Aqua') {
+     //       withCredentials([
+     //           string(credentialsId: 'AQUA_REGISTRY_USER', variable: 'AQUA_REGISTRY_USER'),
+     //           string(credentialsId: 'AQUA_REGISTRY_PASSWORD', variable: 'AQUA_REGISTRY_PASSWORD'),
+     // string(credentialsId: 'AQUA_REGISTRY', variable: 'AQUA_REGISTRY'),
+     // string(credentialsId: 'AQUA_HOST', variable: 'AQUA_HOST'),
+     // string(credentialsId: 'AQUA_SCANNER_TOKEN', variable: 'AQUA_SCANNER_TOKEN')
+     //       ]) {
+     //         sh '''
+     //         podman run --rm -e $AQUA_KEY -e $AQUA_SECRET -e TRIVY_RUN_AS_PLUGIN=aqua -e SAST=true -e INPUT_WORKING_DIRECTORY=/scanning -e TRIVY_SCANNERS=config,vuln,secret -v /aquajcampbell:/scanning docker.io/aquasec/aqua-scanner trivy fs .
+     //         '''
+     //      }
+     //   }
+        
+stage('Manifest Generation') {
     steps {
         // Replace GITHUB_APP_CREDENTIALS_ID with the id of your github app credentials
         withCredentials([
-            string(credentialsId: 'GITHUB_TOKEN', variable: 'GITHUB_TOKEN'),  
+            string(credentialsId: 'GITHUB_TOKEN', variable: 'GITHUB_TOKEN'), 
             string(credentialsId: 'AQUA_KEY', variable: 'AQUA_KEY'), 
             string(credentialsId: 'AQUA_SECRET', variable: 'AQUA_SECRET')
         ]) {
@@ -60,4 +83,10 @@ pipeline {
             '''
         }
     }
-}
+        //post {
+            //always {
+                //archiveArtifacts artifacts: '/'
+           // }
+        //}
+        }
+    }
