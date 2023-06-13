@@ -15,17 +15,8 @@ pipeline {
         ]) {
           script {
             env.TRIVY_RUN_AS_PLUGIN = 'aqua'
-            env.PACKAGE_JSON = "1"
-            env.SAST = "1"
             sh '''
-              docker run --rm
-                -e AQUA_KEY=${AQUA_KEY}
-                -e AQUA_SECRET=${AQUA_SECRET}
-                -e GITHUB_TOKEN=${GITHUB_TOKEN}
-                -e TRIVY_RUN_AS_PLUGIN=${TRIVY_RUN_AS_PLUGIN}
-                -e PACKAGE_JSON=${PACKAGE_JSON}
-                -e SAST=${SAST}
-                aquasec/aqua-scanner trivy fs --scan-type fs --security-checks vuln,config,secret --hide-progress false --format table --severity MEDIUM,HIGH,CRITICAL .
+                aquasec/aqua-scanner trivy fs --scan-type fs --security-checks vuln,config,secret --sast --hide-progress false --format table --severity MEDIUM,HIGH,CRITICAL .
             '''
           }
         }
