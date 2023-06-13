@@ -1,12 +1,14 @@
 pipeline {
-  agent any
+  agent {
+    label 'ubuntu-latest'
+  }
   stages {
-    stage('Aqua scanner') {
-      agent {
-        docker {
-          image 'aquasec/aqua-scanner'
-        }
+    stage('Checkout code') {
+      steps {
+        checkout scm
       }
+    }
+    stage('Run Aqua scanner') {
       steps {
         withCredentials([
           string(credentialsId: 'AQUA_KEY', variable: 'AQUA_KEY'),
@@ -15,18 +17,25 @@ pipeline {
         ]) {
           script {
             env.TRIVY_RUN_AS_PLUGIN = 'aqua'
+            env.PACKAGE_JSON = "1"
+            env.SAST = "1"
             sh '''
-              trivy fs --scanners config,vuln,secret .
-              # To customize which severities to scan for, add the following flag: --severity UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
-              # To enable SAST scanning, add: --sast
-              # To enable reachability scanning, add: --reachability
-              # To enable npm/dotnet non-lock file scanning, add: --package-json / --dotnet-proj
-              # For http/https proxy configuration add env vars: HTTP_PROXY/HTTPS_PROXY, CA-CRET (path to CA certificate)
+              docker run --rm
+                -e AQUA_KEY=${AQUA_KEY}
+                -e AQUA_SECRET=${AQUA_SECRET}
+                -e GITHUB_TOKEN=${GITHUB_TOKEN}
+                -e TRIVY_RUN_AS_PLUGIN=${TRIVY_RUN_AS_PLUGIN}
+                -e PACKAGE_JSON=${PACKAGE_JSON}
+                -e SAST=${SAST}
+                aquasec/aqua-scanner trivy fs --scan-type fs --security-checks vuln,config,secret --hide-progress false --format table --severity MEDIUM,HIGH,CRITICAL .
             '''
           }
         }
       }
     }
+  }
+}
+
 
     stage('Build Docker Image') {
       steps {
@@ -67,5 +76,3 @@ pipeline {
         }
       }
     }
-  }
-}
