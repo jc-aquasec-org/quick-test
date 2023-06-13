@@ -53,7 +53,6 @@ timestamps {
                         --access-token ${GITHUB_TOKEN} \
                         --aqua-key ${AQUA_KEY} \
                         --aqua-secret ${AQUA_SECRET} \
-                        --output sbom.json \
                         --artifact-path ./requirements.txt
                         
                         # The docker image name:tag of the newly built image
