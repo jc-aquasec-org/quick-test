@@ -49,11 +49,12 @@ timestamps {
                     fi
                     BINDIR="." sh install.sh
                     rm install.sh install.sh.checksum
-                    ./billy generate \
+                    ./billy generate - v \
                         --access-token ${GITHUB_TOKEN} \
                         --aqua-key ${AQUA_KEY} \
                         --aqua-secret ${AQUA_SECRET} \
-                        --artifact-path "my-image-name:my-image-tag"
+                        --output sbom.json \
+                        --artifact-path ./requirements.txt
                         
                         # The docker image name:tag of the newly built image
                         # --artifact-path "my-image-name:my-image-tag"
