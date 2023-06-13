@@ -4,7 +4,7 @@ pipeline {
     stage('Aqua scanner') {
       agent {
         docker {
-          image 'aquasec/aqua-scanner'
+          image 'docker://aquasec/aqua-scanner'
         }
       }
       steps {
