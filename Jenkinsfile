@@ -1,7 +1,5 @@
 pipeline {
-  agent {
-    label 'ubuntu-latest'
-  }
+  agent any
   stages {
     stage('Checkout code') {
       steps {
@@ -35,7 +33,6 @@ pipeline {
     }
   }
 }
-
 
     stage('Build Docker Image') {
       steps {
