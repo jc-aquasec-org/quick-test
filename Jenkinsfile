@@ -12,7 +12,7 @@ pipeline {
       steps {
         script {
           docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
-            docker.login(username: credentials('DOCKERHUB_USERNAME'), password: credentials('DOCKERHUB_PASSWORD'))
+            docker.login(username: credentials('DOCKER_USERNAME'), password: credentials('DOCKER_TOKEN'))
           }
         }
       }
