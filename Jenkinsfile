@@ -4,7 +4,7 @@ pipeline {
   stages {
     stage('Checkout code') {
       steps {
-        git branch: 'main', url: 'https://github.com/jc-aquasec-org/quick-test.git', installation: 'my-git'
+        git branch: 'main', url: 'https://github.com/jc-aquasec-org/quick-test.git', tool: 'System Git'
       }
     }
     
