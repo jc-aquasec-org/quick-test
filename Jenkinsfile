@@ -12,7 +12,7 @@ pipeline {
       steps {
         script {
           docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
-            docker.login(username: credentials('DOCKERHUB_USERNAME'), password: credentials('DOCKERHUB_TOKEN'))
+            docker.login(username: credentials('DOCKERHUB_USERNAME'), password: credentials('DOCKERHUB_PASSWORD'))
           }
         }
       }
@@ -28,7 +28,7 @@ pipeline {
               'GITHUB_TOKEN=${github.token}',
               'TRIVY_RUN_AS_PLUGIN=aqua'
             ]) {
-              sh 'trivy fs --scanners config,vuln,secret . --sast --severity UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL --package-json --dotnet-proj'
+              sh 'trivy fs --scanners config,vuln,secret . --sast'
             }
           }
         }
