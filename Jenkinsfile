@@ -4,7 +4,7 @@ pipeline {
   stages {
     stage('Checkout code') {
       steps {
-        checkout scm
+        git branch: 'main', url: 'https://github.com/jc-aquasec-org/quick-test.git', installation: 'my-git'
       }
     }
     
