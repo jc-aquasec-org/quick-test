@@ -1,23 +1,35 @@
 pipeline {
   agent any
+  
   stages {
     stage('Checkout code') {
       steps {
         checkout scm
       }
     }
-    stage('Run Aqua scanner') {
+    
+    stage('Login to DockerHub') {
       steps {
-        withCredentials([
-          string(credentialsId: 'AQUA_KEY', variable: 'AQUA_KEY'),
-          string(credentialsId: 'AQUA_SECRET', variable: 'AQUA_SECRET'),
-          string(credentialsId: 'GITHUB_TOKEN', variable: 'GITHUB_TOKEN')
-        ]) {
-          script {
-            env.TRIVY_RUN_AS_PLUGIN = 'aqua'
-            sh '''
-                aquasec/aqua-scanner trivy fs --scan-type fs --security-checks vuln,config,secret --sast --hide-progress false --format table --severity MEDIUM,HIGH,CRITICAL .
-            '''
+        script {
+          docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
+            docker.login(username: credentials('DOCKERHUB_USERNAME'), password: credentials('DOCKERHUB_TOKEN'))
+          }
+        }
+      }
+    }
+    
+    stage('Aqua Code Scanning (SCA, IaC, and SAST)') {
+      steps {
+        script {
+          docker.image('aquasec/aqua-scanner').inside {
+            withEnv([
+              'AQUA_KEY=${secrets.AQUA_KEY}',
+              'AQUA_SECRET=${secrets.AQUA_SECRET}',
+              'GITHUB_TOKEN=${github.token}',
+              'TRIVY_RUN_AS_PLUGIN=aqua'
+            ]) {
+              sh 'trivy fs --scanners config,vuln,secret . --sast --severity UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL --package-json --dotnet-proj'
+            }
           }
         }
       }
